@@ -155,6 +155,7 @@ void thread_sleep(int wakeup_tick);
 void check_sleep_list(int ticks);
 
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux);
+bool cmp_d_priority(const struct list_elem* a, const struct list_elem* b, void* aux);
 
 void check_thread_priority(void);
 

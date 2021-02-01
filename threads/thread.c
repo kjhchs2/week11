@@ -330,7 +330,14 @@ void thread_yield(void)
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void thread_set_priority(int new_priority)
 {
-    thread_current()->priority = new_priority;
+
+	if (thread_current()->priority < new_priority || list_empty(&thread_current()->donations)) {
+		thread_current()->priority = new_priority;
+	}
+
+    thread_current()->init_priority = new_priority;
+	
+	donate_priority();
 
     if (list_entry(list_begin(&ready_list), struct thread, elem)->priority > new_priority)
     {
@@ -717,6 +724,9 @@ void check_thread_priority()
 #define lock_holder(curr) (curr)->wait_on_lock->holder
 #define get_thread_d(t) (list_entry((t), struct thread, donation_elem))
 
+
+
+
 void refresh_priority(void)
 {
     struct thread *cur_t = thread_current();
@@ -732,33 +742,52 @@ void refresh_priority(void)
     }
 }
 
-void donate_priority(void)
-{
-    enum intr_level old_level;
-    old_level = intr_disable();
 
-    struct thread *cur_t = thread_current();
-    struct thread *curr = lock_holder(cur_t);
-    int nest_depth = 8;
-    // lock holder 하나는 무조건 있음
-    if (curr && curr->priority < cur_t->priority)
-    {
-        curr->priority = cur_t->priority;
-        list_insert_ordered(&curr->donations, &cur_t->donation_elem, cmp_d_priority, NULL);
-    }
-    // 아래 주석 달면 도네 세마 통과..
-    curr = lock_holder(curr);
-    while (curr && nest_depth > 0)
-    {
-        if (curr->priority < cur_t->priority)
-        {
-            curr->priority = cur_t->priority;
-        }
-        curr = lock_holder(curr);
-        nest_depth--;
-    }
-    intr_set_level(old_level);
+void donate_priority(void) {
+	struct thread* cur_t = thread_current();
+	struct lock* l = cur_t->wait_on_lock;
+	int nest_depth = 8;
+
+	while (l && nest_depth > 0) {
+		if (!l->holder) {
+			return;
+		}
+		if (l->holder->priority >= cur_t->priority) {
+			return;
+		}
+		l->holder->priority = cur_t->priority;
+		l = l->holder->wait_on_lock;
+	}
+
 }
+
+//void donate_priority(void)
+//{
+//    enum intr_level old_level;
+//    old_level = intr_disable();
+//
+//    struct thread *cur_t = thread_current();
+//    struct thread *curr = lock_holder(cur_t);
+//    int nest_depth = 8;
+//    // lock holder 하나는 무조건 있음
+//    if (curr && curr->priority < cur_t->priority)
+//    {
+//        curr->priority = cur_t->priority;
+//        list_insert_ordered(&curr->donations, &cur_t->donation_elem, cmp_d_priority, NULL);
+//    }
+//    // 아래 주석 달면 도네 세마 통과..
+//    /*curr = lock_holder(curr);
+//    while (curr && nest_depth > 0)
+//    {
+//        if (curr->priority < cur_t->priority)
+//        {
+//            curr->priority = cur_t->priority;
+//        }
+//        curr = lock_holder(curr);
+//        nest_depth--;
+//    }*/
+//    intr_set_level(old_level);
+//}
 
 // cur_t 의 도네이션 바뀜
 void remove_with_lock(struct lock *lock)
@@ -773,7 +802,7 @@ void remove_with_lock(struct lock *lock)
         if (get_thread_d(curr)->wait_on_lock == lock)
         {
             list_remove(curr);
-            break;
+            //break;
         }
         curr = list_next(curr);
     }
