@@ -11,8 +11,8 @@ FAIL tests/threads/priority-donate-multiple2
 FAIL tests/threads/priority-donate-nest
 FAIL tests/threads/priority-donate-sema
 FAIL tests/threads/priority-donate-lower
-pass tests/threads/priority-fifo
+FAIL tests/threads/priority-fifo
 pass tests/threads/priority-preempt
-pass tests/threads/priority-sema
-pass tests/threads/priority-condvar
+FAIL tests/threads/priority-sema
+FAIL tests/threads/priority-condvar
 FAIL tests/threads/priority-donate-chain

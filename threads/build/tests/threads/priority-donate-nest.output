@@ -8,20 +8,19 @@ Calibrating timer...  157,081,600 loops/s.
 Boot complete.
 Executing 'priority-donate-nest':
 (priority-donate-nest) begin
-(priority-donate-nest) Low thread should have priority 32.  Actual priority: 31.
-(priority-donate-nest) Low thread should have priority 33.  Actual priority: 31.
-(priority-donate-nest) Medium thread should have priority 33.  Actual priority: 32.
-(priority-donate-nest) Medium thread got the lock.
-(priority-donate-nest) High thread got the lock.
-(priority-donate-nest) High thread finished.
-(priority-donate-nest) High thread should have just finished.
-(priority-donate-nest) Middle thread finished.
-(priority-donate-nest) Medium thread should just have finished.
-(priority-donate-nest) Low thread should have priority 31.  Actual priority: 31.
-(priority-donate-nest) end
-Execution of 'priority-donate-nest' complete.
-Timer: 25 ticks
-Thread: 0 idle ticks, 25 kernel ticks, 0 user ticks
-Console: 1102 characters output
-Keyboard: 0 keys pressed
-Powering off...
+Interrupt 0x0e (#PF Page-Fault Exception) at rip=8004207d1a
+ cr2=0000000000000000 error=               0
+rax 0000000000000000 rbx 0000000000000000 rcx 0000000000000000 rdx 0000008004234050
+rsp 0000008004234f50 rbp 0000008004234f70 rsi 0000008004234050 rdi 0000008004000040
+rip 0000008004207d1a r8 0000000000000000  r9 0000000000000000 r10 0000000000000000
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00000006
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC at ../../threads/interrupt.c:361 in intr_handler(): Unexpected interrupt
+Call stack: 0x80042137ea 0x8004208d55 0x8004209107 0x800420a1e9 0x80042187ad 0x800420723c.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 22 ticks
+Thread: 0 idle ticks, 22 kernel ticks, 0 user ticks
+Console: 1
