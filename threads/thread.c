@@ -885,4 +885,10 @@ void mlfqs_recalc(void)
         mlfqs_priority(cur_t);
         mlfqs_recent_cpu(cur_t);
     }
+	for (struct list_elem* curr = list_begin(&sleep_list); curr != list_end(&sleep_list); curr = list_next(curr))
+	{
+		struct thread* cur_t = list_entry(curr, struct thread, elem);
+		mlfqs_priority(cur_t);
+		mlfqs_recent_cpu(cur_t);
+	}
 }
