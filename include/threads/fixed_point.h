@@ -67,7 +67,7 @@ int mult_mixed(int x, int n)
 }
 int div_fp(int x, int y)
 {
-    return ((int64_t) x) * F/y);
+    return ((int64_t)x) * F / y;
 }
 int div_mixed(int x, int n)
 {
