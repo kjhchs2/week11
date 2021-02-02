@@ -203,11 +203,11 @@ void lock_acquire(struct lock *lock)
     /* 현재 스레드의 wait_on_lock 변수에 획득 하기를 기다리는 lock의 주소를 저장 */
     enum intr_level old_level;
     old_level = intr_disable();
-    if (lock->holder)
+    if (!thread_mlfqs && lock->holder)
     {
         thread_current()->wait_on_lock = lock;
         /* multiple donation 을 고려하기 위해 이전상태의 우선순위를 기억,
-           donation 을 받은 스레드의 thread 구조체를 list로 관리한다. */
+            donation 을 받은 스레드의 thread 구조체를 list로 관리한다. */
         /* priority donation 수행하기 위해 donate_priority() 함수 호출 */
         if (lock->holder->priority < thread_current()->priority)
             list_insert_ordered(&lock->holder->donations, &thread_current()->donation_elem, cmp_d_priority, NULL);
@@ -255,8 +255,11 @@ void lock_release(struct lock *lock)
     old_level = intr_disable();
     lock->holder = NULL;
 
-    remove_with_lock(lock);
-    refresh_priority();
+    if (!thread_mlfqs)
+    {
+        remove_with_lock(lock);
+        refresh_priority();
+    }
 
     sema_up(&lock->semaphore);
     intr_set_level(old_level);
