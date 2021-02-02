@@ -209,10 +209,8 @@ void lock_acquire(struct lock *lock)
         /* multiple donation 을 고려하기 위해 이전상태의 우선순위를 기억,
            donation 을 받은 스레드의 thread 구조체를 list로 관리한다. */
         /* priority donation 수행하기 위해 donate_priority() 함수 호출 */
-
-		if (lock->holder->priority < thread_current()->priority)
-			list_insert_ordered(&lock->holder->donations, &thread_current()->donation_elem, cmp_d_priority, NULL);
-
+        if (lock->holder->priority < thread_current()->priority)
+            list_insert_ordered(&lock->holder->donations, &thread_current()->donation_elem, cmp_d_priority, NULL);
         donate_priority();
     }
 
@@ -321,7 +319,7 @@ void cond_wait(struct condition *cond, struct lock *lock)
     ASSERT(lock_held_by_current_thread(lock));
 
     sema_init(&waiter.semaphore, 0);
-    //list_push_back (&cond->waiters, &waiter.elem);
+    // list_push_back(&cond->waiters, &waiter.elem);
     list_insert_ordered(&cond->waiters, &waiter.elem, cmp_sem_priority, NULL);
 
     lock_release(lock);
