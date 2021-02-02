@@ -73,3 +73,11 @@ int div_mixed(int x, int n)
 {
     return x / n;
 }
+
+int fp_to_int_near(int x)
+{
+    int a = fp_to_int(x);
+    int b = fp_to_int_round(x);
+
+    return a > b ? a : b;
+}

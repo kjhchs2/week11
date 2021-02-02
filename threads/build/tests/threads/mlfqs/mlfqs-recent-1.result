@@ -1,2 +1,2 @@
 FAIL
-Run didn't shut down properly: no "Timer: # ticks" message
+run: Sleeping 10 seconds to allow recent_cpu to decay, please wait..TIMEOUT

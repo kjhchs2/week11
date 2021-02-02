@@ -709,8 +709,6 @@ void thread_sleep(int tick)
 
 void check_sleep_list(int ticks)
 {
-    // 1. ��������Ʈ�� ó������ ������ ��ȸ�Ѵ�.
-    // 2. ���ǿ� �´� �༮�� ready list�� �ִ´�.
     struct list_elem *cur = list_begin(&sleep_list);
     struct thread *cur_t;
 
@@ -803,35 +801,6 @@ void donate_priority(void)
     }
 }
 
-//void donate_priority(void)
-//{
-//    enum intr_level old_level;
-//    old_level = intr_disable();
-//
-//    struct thread *cur_t = thread_current();
-//    struct thread *curr = lock_holder(cur_t);
-//    int nest_depth = 8;
-//    // lock holder 하나는 무조건 있음
-//    if (curr && curr->priority < cur_t->priority)
-//    {
-//        curr->priority = cur_t->priority;
-//        list_insert_ordered(&curr->donations, &cur_t->donation_elem, cmp_d_priority, NULL);
-//    }
-//    // 아래 주석 달면 도네 세마 통과..
-//    /*curr = lock_holder(curr);
-//    while (curr && nest_depth > 0)
-//    {
-//        if (curr->priority < cur_t->priority)
-//        {
-//            curr->priority = cur_t->priority;
-//        }
-//        curr = lock_holder(curr);
-//        nest_depth--;
-//    }*/
-//    intr_set_level(old_level);
-//}
-
-// cur_t 의 도네이션 바뀜
 void remove_with_lock(struct lock *lock)
 {
     struct thread *cur_t = thread_current();
@@ -855,7 +824,15 @@ void mlfqs_priority(struct thread *t)
 {
     if (t != idle_thread)
     {
-        t->priority = sub_mixed(sub_fp(int_to_fp(PRI_MAX), div_mixed(t->recent_cpu, 4)), t->nice * 2);
+        t->priority = fp_to_int_near(sub_mixed(sub_fp(int_to_fp(PRI_MAX), div_mixed(t->recent_cpu, 4)), t->nice * 2));
+    }
+    if (t->priority < PRI_MIN)
+    {
+        t->priority = PRI_MIN;
+    }
+    else if (t->priority > PRI_MAX)
+    {
+        t->priority = PRI_MAX;
     }
     return;
 }
@@ -882,6 +859,8 @@ void mlfqs_load_avg(void)
         load_avg = add_fp(mult_fp(div_mixed(int_to_fp(59), 60), load_avg), mult_mixed(div_mixed(int_to_fp(1), 60), list_size(&ready_list) + 1));
     }
 
+    if (load_avg < 0)
+        load_avg = 0;
     // 추후 수정..............??????????!!!!!!!!!!
 }
 
@@ -898,6 +877,8 @@ void mlfqs_increment(void)
 void mlfqs_recalc(void)
 {
     /* 모든 thread의 recent_cpu와 priority값 재계산 한다. */
+    mlfqs_priority(thread_current());
+    mlfqs_recent_cpu(thread_current());
     for (struct list_elem *curr = list_begin(&ready_list); curr != list_end(&ready_list); curr = list_next(curr))
     {
         struct thread *cur_t = list_entry(curr, struct thread, elem);
