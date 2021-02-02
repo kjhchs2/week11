@@ -100,6 +100,10 @@ struct thread
     struct list donations;
     struct list_elem donation_elem;
 
+    /* MLFQ */
+    int nice;
+    int recent_cpu;
+
     /* Shared between thread.c and synch.c. */
     struct list_elem elem; /* List element. */
 
@@ -155,7 +159,7 @@ void thread_sleep(int wakeup_tick);
 void check_sleep_list(int ticks);
 
 bool cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux);
-bool cmp_d_priority(const struct list_elem* a, const struct list_elem* b, void* aux);
+bool cmp_d_priority(const struct list_elem *a, const struct list_elem *b, void *aux);
 
 void check_thread_priority(void);
 
@@ -163,5 +167,12 @@ void check_thread_priority(void);
 void donate_priority(void);
 void remove_with_lock(struct lock *lock);
 void refresh_priority(void);
+
+/* MLFQ */
+void mlfqs_priority(struct thread *t);
+void mlfqs_recent_cpu(struct thread *t);
+void mlfqs_load_avg(void);
+void mlfqs_increment(void);
+void mlfqs_recalc(void);
 
 #endif /* threads/thread.h */
