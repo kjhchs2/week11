@@ -207,6 +207,7 @@ void thread_print_stats(void)
 tid_t thread_create(const char *name, int priority,
                     thread_func *function, void *aux)
 {
+
     struct thread *t;
     tid_t tid;
 
@@ -234,6 +235,7 @@ tid_t thread_create(const char *name, int priority,
 
     /* Add to run queue. */
     thread_unblock(t);
+
     if (thread_get_priority() < t->priority)
     {
         thread_yield();
@@ -885,10 +887,10 @@ void mlfqs_recalc(void)
         mlfqs_priority(cur_t);
         mlfqs_recent_cpu(cur_t);
     }
-	for (struct list_elem* curr = list_begin(&sleep_list); curr != list_end(&sleep_list); curr = list_next(curr))
-	{
-		struct thread* cur_t = list_entry(curr, struct thread, elem);
-		mlfqs_priority(cur_t);
-		mlfqs_recent_cpu(cur_t);
-	}
+    for (struct list_elem *curr = list_begin(&sleep_list); curr != list_end(&sleep_list); curr = list_next(curr))
+    {
+        struct thread *cur_t = list_entry(curr, struct thread, elem);
+        mlfqs_priority(cur_t);
+        mlfqs_recent_cpu(cur_t);
+    }
 }
