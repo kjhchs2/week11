@@ -100,6 +100,23 @@ struct thread
     struct list donations;
     struct list_elem donation_elem;
 
+    /* exit 세마포어 */
+    /* load 세마포어 */
+    /* exit 호출 시 종료 status */
+
+    /* Process */
+    struct thread *parent;
+    struct list children;
+    struct list_elem child_elem;
+    int is_loaded;
+    int is_finished;
+    struct semaphore *exit;
+    struct semaphore *load;
+    int exit_status;
+
+    /* File */
+    struct list fd_table;
+    int fd_num;
     /* MLFQ */
     int nice;
     int recent_cpu;

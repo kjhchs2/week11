@@ -233,6 +233,15 @@ tid_t thread_create(const char *name, int priority,
     t->tf.cs = SEL_KCSEG;
     t->tf.eflags = FLAG_IF;
 
+    /* Process */
+    t->parent = thread_current();
+    t->is_loaded = 0;
+    t->is_finished = 0;
+    // 주의..
+    t->exit_status = -1;
+    sema_init(&t->exit, 0);
+    sema_init(&t->load, 0);
+    list_push_back(&thread_current()->children, &t->child_elem);
     /* Add to run queue. */
     thread_unblock(t);
 
@@ -332,6 +341,9 @@ void thread_exit(void)
     /* Just set our status to dying and schedule another process.
 	   We will be destroyed during the call to schedule_tail(). */
     intr_disable();
+    thread_current()->is_finished = 1;
+    printf("working\n\n");
+    sema_up(&thread_current()->exit);
     do_schedule(THREAD_DYING);
     NOT_REACHED();
 }
@@ -492,6 +504,9 @@ init_thread(struct thread *t, const char *name, int priority)
     t->wait_on_lock = NULL;
     list_init(&t->donations);
 
+    //Process
+    list_init(&t->children);
+
     // don't touch MF
     t->magic = THREAD_MAGIC;
 
@@ -628,7 +643,8 @@ do_schedule(int status)
     {
         struct thread *victim =
             list_entry(list_pop_front(&destruction_req), struct thread, elem);
-        palloc_free_page(victim);
+        // palloc_free_page(victim);
+        // 아닐 수도 있음..
     }
     thread_current()->status = status;
     schedule();

@@ -30,6 +30,7 @@ static void __do_fork(void *);
 /* CUSTOM FUNCTION */
 static char **parse_f_name(char *f_name);
 void argument_stack(char **parse, int count, struct intr_frame *if_);
+struct thread *get_child_process(int pid);
 
 /* General process initializer for initd and other process. */
 static void
@@ -48,6 +49,7 @@ process_init(void)
  * */
 tid_t process_create_initd(const char *file_name)
 {
+
     char *fn_copy;
     tid_t tid;
     char *idx;
@@ -68,6 +70,11 @@ tid_t process_create_initd(const char *file_name)
     /* Create a new thread to execu te FILE_NAME. */
 
     tid = thread_create(file_name, PRI_DEFAULT, initd, fn_copy);
+    // 자식꺼 load 세마 기다림
+    struct thread *cp = get_child_process(tid);
+    printf("%d\n\n", cp->load->value);
+    sema_down(&cp->load);
+
     if (tid == TID_ERROR)
         palloc_free_page(fn_copy);
     for (int i = 0; i < 1 << 30; i++)
@@ -200,14 +207,16 @@ int process_exec(void *f_name)
     process_cleanup();
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
+
     success = load(file_name, &_if);
     /* start user program */
-
+    sema_up(&thread_current()->load);
     /* If load failed, quit. */
     palloc_free_page(file_name);
     if (!success)
         return -1;
 
+    thread_current()->is_loaded = 1;
     /* Start switched process. */
     do_iret(&_if);
     NOT_REACHED();
@@ -224,10 +233,18 @@ int process_exec(void *f_name)
  * does nothing. */
 int process_wait(tid_t child_tid UNUSED)
 {
-    /* XXX: Hint) The pintos exit if process_wait (initd), we recommend you
-	 * XXX:       to add infinite loop here before
-	 * XXX:       implementing the process_wait. */
-    return -1;
+    struct thread *cp;
+    cp = get_child_process(child_tid);
+    if (!cp)
+    {
+        return -1;
+    }
+    sema_down(&cp->exit);
+    int exit_status = cp->exit_status;
+    //예외처리 안해도 되나?
+    remove_child_process(cp);
+
+    return exit_status;
 }
 
 /* Exit the process. This function is called by thread_exit (). */
@@ -725,11 +742,11 @@ void argument_stack(char **parse, int count, struct intr_frame *if_)
         *(char **)if_->rsp = pointers[i];
     }
     //argv
-    if_->rsp -= 8;
-    *(intptr_t *)if_->rsp = if_->rsp + 8;
-    //argc
-    if_->rsp -= 8;
-    *(int *)if_->rsp = count;
+    // if_->rsp -= 8;
+    // *(intptr_t *)if_->rsp = if_->rsp + 8;
+    //argc: 이거 다시 풀려면 시스템콜 get_argument도 바꿔야함
+    // if_->rsp -= 8;
+    // *(int *)if_->rsp = count;
     //fake return address;
     if_->rsp -= 8;
 
@@ -741,4 +758,25 @@ void argument_stack(char **parse, int count, struct intr_frame *if_)
     /* 1. 높은 주소에서 낮은 주소로 자료형 사이즈 고려하여 넣어주소 내려가기
      * 2. 문자열, 주소 , 패딩, 다 위에서 아래로, 문자열은 일단 거꾸로 넣어보고 터지면 반대로 하기.
      * 3. 우리껀 이름이 rsp 그리고*/
+}
+
+/* Process */
+struct thread *get_child_process(int pid)
+{
+    struct thread *cur_t = thread_current();
+    for (struct list_elem *i = list_begin(&cur_t->children); i != list_end(&cur_t->children); i = list_next(i))
+    {
+        struct thread *child_t = list_entry(i, struct thread, child_elem);
+        if (child_t->tid == pid)
+        {
+            return child_t;
+        }
+    }
+    return NULL;
+}
+
+void remove_child_process(struct thread *cp)
+{
+    list_remove(&cp->child_elem);
+    palloc_free_page(cp);
 }
