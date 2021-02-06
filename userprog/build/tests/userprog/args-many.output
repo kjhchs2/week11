@@ -1,0 +1,34 @@
+Kernel command line: -q -f put args-many run 'args-many a b c d e f g h i j k l m n o p q r s t u v'
+0 ~ 9fc00 1
+100000 ~ 13e0000 1
+Pintos booting with: 
+	base_mem: 0x0 ~ 0x9fc00 (Usable: 639 kB)
+	ext_mem: 0x100000 ~ 0x13e0000 (Usable: 19,328 kB)
+Calibrating timer...  153,804,800 loops/s.
+hd0:0: detected 321 sector (160 kB) disk, model "QEMU HARDDISK", serial "QM00001"
+hd0:1: detected 20,160 sector (9 MB) disk, model "QEMU HARDDISK", serial "QM00002"
+hd1:0: detected 102 sector (51 kB) disk, model "QEMU HARDDISK", serial "QM00003"
+Formatting file system...done.
+Boot complete.
+Putting 'args-many' into the file system...
+Executing 'args-many a b c d e f g h i j k l m n o p q r s t u v':
+Interrupt 0x0d (#GP General Protection Exception) at rip=8004217ebc
+ cr2=0000000000000000 error=               0
+rax 000c000d00400003 rbx 0000008004240d00 rcx 000000004747fffe rdx 00000000000000a8
+rsp 0000008004240c10 rbp 0000008004240c30 rsi 0000000000000010 rdi 000c000d00400003
+rip 0000008004217ebc r8 0000000000000017  r9 0000000000000000 r10 0000000000000017
+r11 0000000000000000 r12 0000000000000000 r13 0000000000000000 r14 0000000000000000
+r15 0000000000000000 rflags 00000206
+es: 0010 ds: 0010 cs: 0008 ss: 0010
+Kernel PANIC at ../../userprog/exception.c:97 in kill(): Kernel bug - unexpected interrupt in kernel
+Call stack: 0x80042185db 0x800421d1bc 0x8004209780 0x8004209b9e 0x800421cabd 0x800421c547 0x800421befb 0x800421bc69 0x800420783b.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 62 ticks
+Thread: 30 idle ticks, 29 kernel ticks, 3 user ticks
+hd0:0: 0 reads, 0 writes
+hd0:1: 80 reads, 232 writes
+hd1:0: 102 reads, 0 writes
+Console: 1748 characters output
+Key

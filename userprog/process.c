@@ -11,6 +11,7 @@
 #include "filesys/file.h"
 #include "filesys/filesys.h"
 #include "threads/flags.h"
+#include "threads/synch.h"
 #include "threads/init.h"
 #include "threads/interrupt.h"
 #include "threads/palloc.h"
@@ -32,9 +33,12 @@ static char **parse_f_name(char *f_name);
 void argument_stack(char **parse, int count, struct intr_frame *if_);
 struct thread *get_child_process(int pid);
 
+int process_add_file(struct file *f);
+struct file *process_get_file(int fd);
+void process_close_file(int fd);
+
 /* General process initializer for initd and other process. */
-static void
-process_init(void)
+static void process_init(void)
 {
     struct thread *current = thread_current();
 }
@@ -71,14 +75,14 @@ tid_t process_create_initd(const char *file_name)
 
     tid = thread_create(file_name, PRI_DEFAULT, initd, fn_copy);
     // 자식꺼 load 세마 기다림
-    struct thread *cp = get_child_process(tid);
-    printf("%d\n\n", cp->load->value);
+    struct thread *cp;
+    // 가지고 오는건 잘가지고 오는데 로드 밸류가 이상함.
+    cp = get_child_process(tid);
+
     sema_down(&cp->load);
 
     if (tid == TID_ERROR)
         palloc_free_page(fn_copy);
-    for (int i = 0; i < 1 << 30; i++)
-        ;
 
     return tid;
 }
@@ -93,7 +97,6 @@ initd(void *f_name)
 #endif
     // 그냥 스레드 커런트를 커런트라는 애한테 저장하던데?
     process_init();
-
     if (process_exec(f_name) < 0)
         PANIC("Fail to launch initd\n");
     NOT_REACHED();
@@ -210,6 +213,7 @@ int process_exec(void *f_name)
 
     success = load(file_name, &_if);
     /* start user program */
+    // printf("loaded\n");
     sema_up(&thread_current()->load);
     /* If load failed, quit. */
     palloc_free_page(file_name);
@@ -240,6 +244,7 @@ int process_wait(tid_t child_tid UNUSED)
         return -1;
     }
     sema_down(&cp->exit);
+
     int exit_status = cp->exit_status;
     //예외처리 안해도 되나?
     remove_child_process(cp);
@@ -251,6 +256,14 @@ int process_wait(tid_t child_tid UNUSED)
 void process_exit(void)
 {
     struct thread *curr = thread_current();
+    uint32_t *pd;
+
+    for (int i = 0; i < curr->fd_num - 2; i++)
+    {
+        process_close_file(2);
+    }
+    palloc_free_page(curr->fd_table);
+
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
@@ -379,7 +392,6 @@ load(const char *file_name, struct intr_frame *if_)
         goto done;
     process_activate(thread_current());
     /* 나는 여기다가 만들어보겠다..*/
-
     char *argv[14];
     char *token, *save_ptr;
     int argc = 0;
@@ -476,8 +488,7 @@ load(const char *file_name, struct intr_frame *if_)
     if_->rip = ehdr.e_entry;
     argument_stack(argv, argc, if_);
 
-    printf("%p\n\n\n", if_->rsp);
-    hex_dump(if_->rsp, (void *)(if_->rsp), 72, 1);
+    // hex_dump(if_->rsp, (void *)(if_->rsp), USER_STACK - if_->rsp, 1);
     /* TODO: Your code goes here.
         	 * TODO: Implement argument passing (see project2/argument_passing.html). */
 
@@ -779,4 +790,36 @@ void remove_child_process(struct thread *cp)
 {
     list_remove(&cp->child_elem);
     palloc_free_page(cp);
+}
+
+/**************************file system************************************/
+
+int process_add_file(struct file *f)
+{
+    struct thread *cur_t = thread_current();
+    cur_t->fd_table[cur_t->fd_num] = f;
+    cur_t->fd_num++;
+
+    return cur_t->fd_num - 1;
+}
+
+struct file *process_get_file(int fd)
+{
+    struct thread *cur_t = thread_current();
+
+    if (cur_t->fd_table[fd])
+        return cur_t->fd_table[fd];
+    else
+        return NULL;
+}
+
+void process_close_file(int fd)
+{
+    struct thread *cur_t = thread_current();
+    /* 파일 디스크립터에 해당하는 파일을 닫음 */
+    file_close(cur_t->fd_table[fd]);
+    /* 파일 디스크립터 테이블 해당 엔트리 초기화 */
+    cur_t->fd_table[fd] = cur_t->fd_table[cur_t->fd_num - 1];
+    cur_t->fd_table[cur_t->fd_num - 1] = 0;
+    cur_t->fd_num--;
 }

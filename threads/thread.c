@@ -239,8 +239,19 @@ tid_t thread_create(const char *name, int priority,
     t->is_finished = 0;
     // 주의..
     t->exit_status = -1;
-    sema_init(&t->exit, 0);
+
     sema_init(&t->load, 0);
+    sema_init(&t->exit, 0);
+
+    /* File */
+    /* fd 값 초기화(0,1은 표준 입력,출력) */
+    /* File Descriptor 테이블에 메모리 할당 */
+    t->fd_num = 2;
+
+    // void *fdt;
+    // fdt = palloc_get_page(PAL_ZERO | PAL_ASSERT);
+    // t->fd_table = (struct file *)fdt;
+
     list_push_back(&thread_current()->children, &t->child_elem);
     /* Add to run queue. */
     thread_unblock(t);
@@ -342,7 +353,6 @@ void thread_exit(void)
 	   We will be destroyed during the call to schedule_tail(). */
     intr_disable();
     thread_current()->is_finished = 1;
-    printf("working\n\n");
     sema_up(&thread_current()->exit);
     do_schedule(THREAD_DYING);
     NOT_REACHED();

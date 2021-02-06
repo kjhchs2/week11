@@ -3,6 +3,7 @@
 
 #include <debug.h>
 #include <list.h>
+#include <threads/synch.h>
 #include <stdint.h>
 #include "threads/interrupt.h"
 #ifdef VM
@@ -110,13 +111,14 @@ struct thread
     struct list_elem child_elem;
     int is_loaded;
     int is_finished;
-    struct semaphore *exit;
-    struct semaphore *load;
+    struct semaphore exit;
+    struct semaphore load;
     int exit_status;
 
     /* File */
-    struct list fd_table;
+    struct file *fd_table[64];
     int fd_num;
+
     /* MLFQ */
     int nice;
     int recent_cpu;
