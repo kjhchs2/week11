@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
     int i;
 
     test_name = "args";
-
     if (((unsigned long long)argv & 7) != 0)
         msg("argv and stack must be word-aligned, actually %p", argv);
 

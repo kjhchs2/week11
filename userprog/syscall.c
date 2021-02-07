@@ -1,5 +1,6 @@
 #include "userprog/syscall.h"
 #include <stdio.h>
+#include <stdbool.h>
 #include <syscall-nr.h>
 #include "threads/interrupt.h"
 #include "threads/thread.h"
@@ -8,17 +9,20 @@
 #include "threads/flags.h"
 #include "intrinsic.h"
 #include "filesys/file.h"
+#include "filesys/filesys.h"
+#include "filesys/inode.h"
+#include "filesys/directory.h"
 
 void syscall_entry(void);
 void syscall_handler(struct intr_frame *if_);
 void get_argument(struct intr_frame *if_, intptr_t *arg, int count);
 void halt(void);
 void exit(int status);
-bool create(const char *file, unsigned initial_size);
+bool create(struct intr_frame *f, const char *file, unsigned initial_size);
 bool remove(const char *file);
-int open(const char *file);
-int filesize(int fd);
-int read(int fd, void *buffer, unsigned size);
+int open(struct intr_frame *f, const char *file);
+int filesize(struct intr_frame *f, int fd);
+int read(struct intr_frame *f, int fd, void *buffer, unsigned size);
 int write(int fd, void *buffer, unsigned size);
 void seek(int fd, unsigned position);
 unsigned tell(int fd);
@@ -65,7 +69,7 @@ void syscall_handler(struct intr_frame *f UNUSED)
     get_argument(f, args, 6);
     // printf("%d %d %d\n\n", f->R.rax, f->R.rsi, f->R.rdx);
 
-    hex_dump(f->rsp, (void *)(f->rsp), USER_STACK - f->rsp, 1);
+    // hex_dump(f->rsp, (void *)(f->rsp), USER_STACK - f->rsp, 1);
 
     switch (syscall_n)
     {
@@ -85,16 +89,19 @@ void syscall_handler(struct intr_frame *f UNUSED)
         wait(args[0]);
         break;
     case SYS_CREATE:
-        create(args[0], args[1]);
+        create(f, args[0], args[1]);
         break;
     case SYS_REMOVE:
         remove(args[0]);
         break;
     case SYS_OPEN:
-        open(args[0]);
+        open(f, args[0]);
+        break;
+    case SYS_FILESIZE:
+        filesize(f, args[0]);
         break;
     case SYS_READ:
-        read(args[0], args[1], args[2]);
+        read(f, args[0], args[1], args[2]);
         break;
     case SYS_WRITE:
         write(args[0], args[1], args[2]);
@@ -149,7 +156,6 @@ void check_address(void *addr)
 {
     if ((intptr_t)addr > USER_STACK)
     {
-        printf("invalid stack pointer access\n");
         thread_exit();
     }
 }
@@ -168,9 +174,29 @@ void halt(void)
     power_off();
 }
 
-bool create(const char *file, unsigned initial_size)
+bool create(struct intr_frame *f, const char *file, unsigned initial_size)
 {
-    return filesys_create(file, initial_size);
+    if ((intptr_t)file > USER_STACK || file == NULL || strlen(file) == 0)
+    {
+        exit(-1);
+    }
+    if (strlen(file) >= 14)
+    {
+        f->R.rax = 0;
+        return 0;
+    }
+    struct dir *d = dir_open_root();
+    struct inode **in;
+
+    if (dir_lookup(d, file, in))
+    {
+        f->R.rax = 0;
+        return 0;
+    }
+    filesys_create(file, initial_size);
+
+    f->R.rax = 1;
+    return 0;
 }
 
 bool remove(const char *file)
@@ -178,55 +204,73 @@ bool remove(const char *file)
     return filesys_remove(file);
 }
 
-int open(const char *file)
+int open(struct intr_frame *f, const char *file)
 {
+    // lock_acquire(&filesys_lock);
     struct file *new_file;
     int fd;
-    /* 파일을 open */
-    new_file = filesys_open(file);
-    // new_file = file_open(file->inode);
-    fd = process_add_file(new_file);
+    struct thread *cur_t = thread_current();
 
-    if (fd)
-        return fd;
+    struct dir *dir = dir_open_root();
+    struct inode *new = NULL;
+    if (file == NULL)
+    {
+        f->R.rax = -1;
+        return 0;
+    }
+    new_file = filesys_open(file);
+    for (int i = 2; i < cur_t->fd_num; i++)
+    {
+        if (file_get_inode(cur_t->fd_table[i]) == new_file)
+        {
+            new_file = file_reopen(new_file);
+            f->R.rax = process_add_file(new_file);
+            return 0;
+        }
+    }
+    if (new_file != NULL)
+    {
+        f->R.rax = process_add_file(new_file);
+    }
     else
-        return -1;
+        f->R.rax = -1;
+    // lock_release(&filesys_lock);
+    return 0;
 }
 
-int filesize(int fd)
+int filesize(struct intr_frame *f, int fd)
 {
     struct file *new_file;
     int length;
-    new_file = process_get_file(fd);
 
-    if (new_file)
-        return file_length(new_file);
-    else
-        return -1;
+    f->R.rax = file_length(thread_current()->fd_table[fd]);
+
+    return 0;
 }
 
-int read(int fd, void *buffer, unsigned size)
+int read(struct intr_frame *f, int fd, void *buffer, unsigned size)
 {
     struct file *new_file;
-
     lock_acquire(&filesys_lock);
-    new_file = process_get_file(fd);
+    new_file = thread_current()->fd_table[fd];
     int readn = 0;
     if (fd == 0)
     {
         for (readn; readn < size; readn += input_getc())
             ;
-        return readn;
+        f->R.rax = readn;
+        return 0;
     }
     lock_release(&filesys_lock);
-    return file_read(new_file, buffer, size);
+    f->R.rax = file_read(new_file, buffer, size);
+    return 0;
 }
 
 int write(int fd, void *buffer, unsigned size)
 {
     struct file *new_file;
 
-    lock_acquire(&filesys_lock);
+    // lock_acquire(&filesys_lock);
     new_file = process_get_file(fd);
     int writen = 0;
     if (fd == 1)
@@ -234,7 +278,7 @@ int write(int fd, void *buffer, unsigned size)
         putbuf(buffer, size);
         return size;
     }
-    lock_release(&filesys_lock);
+    // lock_release(&filesys_lock);
     return file_write(new_file, buffer, size);
 }
 
@@ -261,5 +305,7 @@ void close(int fd)
 {
     /* 해당 파일 디스크립터에 해당하는 파일을 닫음 */
     /* 파일 디스크립터 엔트리 초기화 */
+    lock_acquire(&filesys_lock);
     process_close_file();
+    lock_release(&filesys_lock);
 }

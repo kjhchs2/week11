@@ -258,11 +258,11 @@ void process_exit(void)
     struct thread *curr = thread_current();
     uint32_t *pd;
 
-    for (int i = 0; i < curr->fd_num - 2; i++)
+    for (int i = 2; i < curr->fd_num - 2; i++)
     {
         process_close_file(2);
     }
-    palloc_free_page(curr->fd_table);
+    // palloc_free_page(curr->fd_table);
 
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -392,7 +392,7 @@ load(const char *file_name, struct intr_frame *if_)
         goto done;
     process_activate(thread_current());
     /* 나는 여기다가 만들어보겠다..*/
-    char *argv[14];
+    char *argv[128];
     char *token, *save_ptr;
     int argc = 0;
     for (token = strtok_r(file_name, " ", &save_ptr); token != NULL;
@@ -743,32 +743,16 @@ void argument_stack(char **parse, int count, struct intr_frame *if_)
     }
     if_->rsp -= (8 - (char_count % 8));
 
-    // 끝인것 알려주는 녀석 넣어주기..
-    // 왜 11인가??
-    //인자 주소넣기
     if_->rsp -= 8;
     for (int i = count - 1; i >= 0; i--)
     {
         if_->rsp -= 8;
         *(char **)if_->rsp = pointers[i];
     }
-    //argv
-    // if_->rsp -= 8;
-    // *(intptr_t *)if_->rsp = if_->rsp + 8;
-    //argc: 이거 다시 풀려면 시스템콜 get_argument도 바꿔야함
-    // if_->rsp -= 8;
-    // *(int *)if_->rsp = count;
-    //fake return address;
-    if_->rsp -= 8;
-
-    /* 프로그램 이름 및 인자 주소들 push */
-    /* argv (문자열을 가리키는 주소들의 배열을 가리킴) push*/
-    /* argc (문자열의 개수 저장) push */
-    /* fake address(0) 저장 */
-
-    /* 1. 높은 주소에서 낮은 주소로 자료형 사이즈 고려하여 넣어주소 내려가기
-     * 2. 문자열, 주소 , 패딩, 다 위에서 아래로, 문자열은 일단 거꾸로 넣어보고 터지면 반대로 하기.
-     * 3. 우리껀 이름이 rsp 그리고*/
+    intptr_t rsi = if_->rsp;
+    if_->rsp -= 112;
+    if_->R.rsi = rsi;
+    if_->R.rdi = count;
 }
 
 /* Process */
@@ -797,18 +781,20 @@ void remove_child_process(struct thread *cp)
 int process_add_file(struct file *f)
 {
     struct thread *cur_t = thread_current();
-    cur_t->fd_table[cur_t->fd_num] = f;
+    int n = cur_t->fd_num;
+    cur_t->fd_table[n] = f;
     cur_t->fd_num++;
-
-    return cur_t->fd_num - 1;
+    return n;
 }
 
 struct file *process_get_file(int fd)
 {
-    struct thread *cur_t = thread_current();
+    struct file *cur_f = thread_current()->fd_table[fd];
 
-    if (cur_t->fd_table[fd])
-        return cur_t->fd_table[fd];
+    if (cur_f != NULL)
+    {
+        return cur_f;
+    }
     else
         return NULL;
 }
