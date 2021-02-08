@@ -152,7 +152,6 @@ void file_allow_write(struct file *file)
 off_t file_length(struct file *file)
 {
     ASSERT(file != NULL);
-    printf("inner\n\n");
     return inode_length(file->inode);
 }
 

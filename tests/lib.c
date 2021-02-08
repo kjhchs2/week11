@@ -140,7 +140,6 @@ void check_file_handle(int fd,
         ofs += block_size;
     }
 
-    printf("working\n\n");
     /* Now fail due to wrong file size. */
     if (file_size != size)
         fail("size of %s (%zu) differs from expected (%zu)",

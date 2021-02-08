@@ -15,20 +15,19 @@
 
 void syscall_entry(void);
 void syscall_handler(struct intr_frame *if_);
-void get_argument(struct intr_frame *if_, intptr_t *arg, int count);
+void get_argument(struct intr_frame *f, intptr_t *arg, int count);
 void halt(void);
 void exit(int status);
-bool create(struct intr_frame *f, const char *file, unsigned initial_size);
+bool create(const char *file, unsigned initial_size);
 bool remove(const char *file);
-int open(struct intr_frame *f, const char *file);
-int filesize(struct intr_frame *f, int fd);
-int read(struct intr_frame *f, int fd, void *buffer, unsigned size);
+int open(const char *file);
+int filesize(int fd);
+int read(int fd, void *buffer, unsigned size);
 int write(int fd, void *buffer, unsigned size);
 void seek(int fd, unsigned position);
 unsigned tell(int fd);
 void close(int fd);
-
-/* ssystem call */
+tid_t fork(const char *thread_name);
 tid_t exec(const char *cmd_line);
 struct lock filesys_lock;
 
@@ -80,37 +79,38 @@ void syscall_handler(struct intr_frame *f UNUSED)
         exit(args[0]);
         break;
     case SYS_FORK:
+        fork(args[0]);
         break;
     case SYS_EXEC:
         check_address((void *)args[0]);
-        *(int *)f->R.rax = exec((const char *)args[0]);
+        f->R.rax = exec((const char *)args[0]);
         break;
     case SYS_WAIT:
-        wait(args[0]);
+        f->R.rax = wait(args[0]);
         break;
     case SYS_CREATE:
-        create(f, args[0], args[1]);
+        f->R.rax = create(args[0], args[1]);
         break;
     case SYS_REMOVE:
-        remove(args[0]);
+        f->R.rax = remove(args[0]);
         break;
     case SYS_OPEN:
-        open(f, args[0]);
+        f->R.rax = open(args[0]);
         break;
     case SYS_FILESIZE:
-        filesize(f, args[0]);
+        f->R.rax = filesize(args[0]);
         break;
     case SYS_READ:
-        read(f, args[0], args[1], args[2]);
+        f->R.rax = read(args[0], args[1], args[2]);
         break;
     case SYS_WRITE:
-        write(args[0], args[1], args[2]);
+        f->R.rax = write(args[0], args[1], args[2]);
         break;
     case SYS_SEEK:
         seek(args[0], args[1]);
         break;
     case SYS_TELL:
-        tell(args[0]);
+        f->R.rax = tell(args[0]);
         break;
     case SYS_CLOSE:
         close(args[0]);
@@ -134,6 +134,16 @@ tid_t exec(const char *cmd_line)
     int success;
     success = process_create_initd(cmd_line);
     return success;
+}
+
+tid_t fork(const char *thread_name)
+{
+    tid_t tid;
+    if ((tid = process_fork(thread_name, thread_current()->tf)) == TID_ERROR)
+    {
+        return TID_ERROR;
+    };
+    return tid;
 }
 
 int wait(tid_t pid)
@@ -174,7 +184,7 @@ void halt(void)
     power_off();
 }
 
-bool create(struct intr_frame *f, const char *file, unsigned initial_size)
+bool create(const char *file, unsigned initial_size)
 {
     if ((intptr_t)file > USER_STACK || file == NULL || strlen(file) == 0)
     {
@@ -182,7 +192,6 @@ bool create(struct intr_frame *f, const char *file, unsigned initial_size)
     }
     if (strlen(file) >= 14)
     {
-        f->R.rax = 0;
         return 0;
     }
     struct dir *d = dir_open_root();
@@ -190,13 +199,9 @@ bool create(struct intr_frame *f, const char *file, unsigned initial_size)
 
     if (dir_lookup(d, file, in))
     {
-        f->R.rax = 0;
         return 0;
     }
-    filesys_create(file, initial_size);
-
-    f->R.rax = 1;
-    return 0;
+    return filesys_create(file, initial_size);
 }
 
 bool remove(const char *file)
@@ -204,9 +209,8 @@ bool remove(const char *file)
     return filesys_remove(file);
 }
 
-int open(struct intr_frame *f, const char *file)
+int open(const char *file)
 {
-    // lock_acquire(&filesys_lock);
     struct file *new_file;
     int fd;
     struct thread *cur_t = thread_current();
@@ -215,40 +219,34 @@ int open(struct intr_frame *f, const char *file)
     struct inode *new = NULL;
     if (file == NULL)
     {
-        f->R.rax = -1;
-        return 0;
+        return -1;
     }
+
     new_file = filesys_open(file);
     for (int i = 2; i < cur_t->fd_num; i++)
     {
         if (file_get_inode(cur_t->fd_table[i]) == new_file)
         {
             new_file = file_reopen(new_file);
-            f->R.rax = process_add_file(new_file);
-            return 0;
+            return process_add_file(new_file);
         }
     }
+
     if (new_file != NULL)
-    {
-        f->R.rax = process_add_file(new_file);
-    }
+        return process_add_file(new_file);
     else
-        f->R.rax = -1;
-    // lock_release(&filesys_lock);
-    return 0;
+        return -1;
 }
 
-int filesize(struct intr_frame *f, int fd)
+int filesize(int fd)
 {
     struct file *new_file;
     int length;
 
-    f->R.rax = file_length(thread_current()->fd_table[fd]);
-
-    return 0;
+    return file_length(thread_current()->fd_table[fd]);
 }
 
-int read(struct intr_frame *f, int fd, void *buffer, unsigned size)
+int read(int fd, void *buffer, unsigned size)
 {
     struct file *new_file;
     lock_acquire(&filesys_lock);
@@ -258,12 +256,10 @@ int read(struct intr_frame *f, int fd, void *buffer, unsigned size)
     {
         for (readn; readn < size; readn += input_getc())
             ;
-        f->R.rax = readn;
-        return 0;
+        return readn;
     }
     lock_release(&filesys_lock);
-    f->R.rax = file_read(new_file, buffer, size);
-    return 0;
+    return file_read(new_file, buffer, size);
 }
 
 int write(int fd, void *buffer, unsigned size)
@@ -271,7 +267,7 @@ int write(int fd, void *buffer, unsigned size)
     struct file *new_file;
 
     // lock_acquire(&filesys_lock);
-    new_file = process_get_file(fd);
+    new_file = thread_current()->fd_table[fd];
     int writen = 0;
     if (fd == 1)
     {
@@ -290,7 +286,6 @@ void seek(int fd, unsigned position)
     new_file = process_get_file(fd);
     /* 해당 열린 파일의 위치(offset)를 position만큼 이동 */
     file_seek(new_file, position);
-    // new_file->pos += position;
 }
 
 unsigned tell(int fd)
@@ -298,7 +293,6 @@ unsigned tell(int fd)
     struct file *new_file;
     new_file = process_get_file(fd);
     return file_tell(new_file);
-    // return new_file->pos;
 }
 
 void close(int fd)
