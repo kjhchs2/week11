@@ -208,6 +208,7 @@ __do_fork(void *aux)
     {
         current->fd_table[i] = file_duplicate(parent->fd_table[i]);
     }
+    current->fd_num = parent->fd_num;
     sema_up(&current->load);
     /* TODO: Your code goes here.
 	 * TODO: Hint) To duplicate the file object, use `file_duplicate`
@@ -233,11 +234,11 @@ error:
 int process_exec(void *f_name)
 {
     struct file **f_table;
-    // int fd_n;
+    int fd_n;
     char *file_name;
     bool success;
 
-    // fd_n = thread_current()->fd_num;
+    fd_n = thread_current()->fd_num;
     f_table = palloc_get_page(PAL_ZERO);
     file_name = palloc_get_page(PAL_ZERO);
     memcpy(file_name, f_name, strlen(f_name));
@@ -255,7 +256,7 @@ int process_exec(void *f_name)
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
     thread_current()->fd_table = f_table;
-    // thread_current()->fd_num = fd_n;
+    thread_current()->fd_num = fd_n;
     success = load(file_name, &_if);
     /* start user program */
     // printf("loaded\n");
@@ -828,6 +829,7 @@ int process_add_file(struct file *f)
     int n = cur_t->fd_num;
     cur_t->fd_table[n] = f;
     cur_t->fd_num++;
+
     return n;
 }
 

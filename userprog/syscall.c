@@ -212,11 +212,8 @@ bool remove(const char *file)
 int open(const char *file)
 {
     struct file *new_file;
-    int fd;
     struct thread *cur_t = thread_current();
 
-    struct dir *dir = dir_open_root();
-    struct inode *new = NULL;
     if (file == NULL)
     {
         return -1;
