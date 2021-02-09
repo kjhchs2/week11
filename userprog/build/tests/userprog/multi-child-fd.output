@@ -16,17 +16,16 @@ Putting 'child-close' into the file system...
 Executing 'multi-child-fd':
 (multi-child-fd) begin
 (multi-child-fd) open "sample.txt"
-(multi-child-fd) wait(exec()) = -1
-(multi-child-fd) verified contents of "sample.txt"
-(multi-child-fd) end
-multi-child-fd: exit(0)
-Execution of 'multi-child-fd' complete.
+(child-close) begin
+Kernel PANIC at ../../filesys/file.c:154 in file_length(): assertion `file != NULL' failed.
+Call stack: 0x800421859a 0x800421f43f 0x800421dbd9 0x800421d750 0x800421d4bf 0x4007c4 0x4001bc 0x400c6e.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
 Timer: 63 ticks
 Thread: 30 idle ticks, 30 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 149 reads, 488 writes
+hd0:1: 201 reads, 488 writes
 hd1:0: 220 reads, 0 writes
-Console: 1125 characters output
-Keyboard: 0 keys pressed
-Exception: 0 page faults
-Powering off...
+Console: 1325 characters output
+Key

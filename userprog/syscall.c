@@ -27,7 +27,7 @@ int write(int fd, void *buffer, unsigned size);
 void seek(int fd, unsigned position);
 unsigned tell(int fd);
 void close(int fd);
-tid_t fork(const char *thread_name);
+tid_t fork(struct intr_frame *f, const char *thread_name);
 tid_t exec(const char *cmd_line);
 struct lock filesys_lock;
 
@@ -79,7 +79,7 @@ void syscall_handler(struct intr_frame *f UNUSED)
         exit(args[0]);
         break;
     case SYS_FORK:
-        fork(args[0]);
+        f->R.rax = fork(f, args[0]);
         break;
     case SYS_EXEC:
         check_address((void *)args[0]);
@@ -136,10 +136,10 @@ tid_t exec(const char *cmd_line)
     return success;
 }
 
-tid_t fork(const char *thread_name)
+tid_t fork(struct intr_frame *f, const char *thread_name)
 {
     tid_t tid;
-    if ((tid = process_fork(thread_name, thread_current()->tf)) == TID_ERROR)
+    if ((tid = process_fork(thread_name, f)) == TID_ERROR)
     {
         return TID_ERROR;
     };
@@ -174,7 +174,7 @@ void exit(int status)
 {
     struct thread *cur = thread_current();
     /* 프로세스 디스크립터에 exit status 저장 */
-    cur->exit_status = 0;
+    cur->exit_status = status;
     printf("%s: exit(%d)\n", cur->name, status);
     thread_exit();
 }

@@ -16,25 +16,328 @@ Executing 'syn-write':
 (syn-write) begin
 (syn-write) create "stuff"
 (syn-write) exec child 1 of 10: "child-syn-wrt 0"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 2 of 10: "child-syn-wrt 1"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 2 of 10: "child-syn-wrt 1"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 3 of 10: "child-syn-wrt 2"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 3 of 10: "child-syn-wrt 2"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 3 of 10: "child-syn-wrt 2"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 3 of 10: "child-syn-wrt 2"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 4 of 10: "child-syn-wrt 3"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 5 of 10: "child-syn-wrt 4"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 6 of 10: "child-syn-wrt 5"
+child-syn-wrt: exit(-1)
 (syn-write) exec child 9 of 10: "child-syn-wrt 8"
-(syn-write) exec child 10 of 10: "child-syn-wrt 9"
-(syn-write) wait for child 1 of 10 returned -1 (expected 0)
-(syn-write) wait for child 1 of 10 returned -1 (expected 0): FAILED
-syn-write: exit(1)
-Execution of 'syn-write' complete.
-Timer: 65 ticks
-Thread: 30 idle ticks, 30 kernel ticks, 5 user ticks
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 7 of 10: "child-syn-wrt 6"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 9 of 10: "child-syn-wrt 8"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 9 of 10: "child-syn-wrt 8"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 9 of 10: "child-syn-wrt 8"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 9 of 10: "child-syn-wrt 8"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 9 of 10: "child-syn-wrt 8"
+child-syn-wrt: exit(-1)
+(syn-write) exec child 8 of 10: "child-syn-wrt 7"
+Kernel PANIC at ../../userprog/process.c:101 in initd(): Fail to launch initd
+
+Call stack: 0x800421859a 0x800421bc61 0x800420783b.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 565 ticks
+Thread: 30 idle ticks, 81 kernel ticks, 454 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 148 reads, 512 writes
+hd0:1: 8624 reads, 512 writes
 hd1:0: 226 reads, 0 writes
-Console: 1548 characters output
-Keyboard: 0 keys pressed
-Exception: 0 page faults
-Powering off...
+Console: 12748 characters output
+Keybo

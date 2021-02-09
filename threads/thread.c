@@ -654,7 +654,6 @@ do_schedule(int status)
         struct thread *victim =
             list_entry(list_pop_front(&destruction_req), struct thread, elem);
         // palloc_free_page(victim);
-        // 아닐 수도 있음..
     }
     thread_current()->status = status;
     schedule();

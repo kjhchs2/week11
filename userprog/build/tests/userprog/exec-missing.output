@@ -16,12 +16,12 @@ Executing 'exec-missing':
 load: no-such-file: open failed
 Kernel PANIC at ../../userprog/process.c:101 in initd(): Fail to launch initd
 
-Call stack: 0x80042185db 0x800421bca2 0x800420783b.
+Call stack: 0x800421859a 0x800421bc61 0x800420783b.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.
-Timer: 58 ticks
-Thread: 30 idle ticks, 26 kernel ticks, 2 user ticks
+Timer: 57 ticks
+Thread: 30 idle ticks, 26 kernel ticks, 1 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 96 reads, 232 writes
 hd1:0: 102 reads, 0 writes

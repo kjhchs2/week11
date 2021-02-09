@@ -13,15 +13,17 @@ Boot complete.
 Putting 'multi-oom' into the file system...
 Executing 'multi-oom':
 (multi-oom) begin
-(multi-oom) Should return > 0.: FAILED
-multi-oom: exit(1)
-Execution of 'multi-oom' complete.
-Timer: 58 ticks
-Thread: 30 idle ticks, 27 kernel ticks, 2 user ticks
+child_0_O: exit(-1)
+child_0_O: exit(-1)
+Kernel PANIC at ../../filesys/inode.c:327 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
+Call stack: 0x800421859a 0x8004220593 0x800421f3ea 0x800421f197 0x800421cf55 0x800421c1de 0x800420742d 0x800421d9bf 0x800421d44d 0x800420973f 0x8004209b5d 0x800421c1de 0x800420742d 0x800421d9bf 0x800421d44d 0x800420973f 0x8004209b5d 0x800421db30 0x800421d72e 0x800421d4bf 0x40011c 0x4003a7 0x40044b 0x400fb0.
+The `backtrace' program can make call stacks useful.
+Read "Backtraces" in the "Debugging Tools" chapter
+of the Pintos documentation for more information.
+Timer: 60 ticks
+Thread: 30 idle ticks, 26 kernel ticks, 4 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 83 reads, 242 writes
+hd0:1: 149 reads, 242 writes
 hd1:0: 107 reads, 0 writes
-Console: 863 characters output
-Keyboard: 0 keys pressed
-Exception: 0 page faults
-Powering off...
+Console: 1386 characters output
+Key

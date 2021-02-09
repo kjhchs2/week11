@@ -116,6 +116,9 @@ struct thread
     struct semaphore load;
     int exit_status;
 
+    /* Fork */
+    struct intr_frame f_if;
+
     /* File */
     struct file *fd_table[64];
     int fd_num;
