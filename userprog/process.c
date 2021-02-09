@@ -237,7 +237,7 @@ int process_exec(void *f_name)
     char *file_name;
     bool success;
 
-    fd_n = thread_current()->fd_num;
+    // fd_n = thread_current()->fd_num;
     f_table = palloc_get_page(PAL_ZERO);
     file_name = palloc_get_page(PAL_ZERO);
     memcpy(file_name, f_name, strlen(f_name));
@@ -251,7 +251,7 @@ int process_exec(void *f_name)
     _if.cs = SEL_UCSEG;
     _if.eflags = FLAG_IF | FLAG_MBS;
     /* We first kill the current context */
-    process_cleanup();
+    // process_cleanup();
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
     thread_current()->fd_table = f_table;
