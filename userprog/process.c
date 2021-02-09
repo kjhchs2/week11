@@ -232,11 +232,16 @@ error:
  * Returns -1 on fail. */
 int process_exec(void *f_name)
 {
+    struct file **f_table;
+    // int fd_n;
     char *file_name;
     bool success;
 
+    fd_n = thread_current()->fd_num;
+    f_table = palloc_get_page(PAL_ZERO);
     file_name = palloc_get_page(PAL_ZERO);
     memcpy(file_name, f_name, strlen(f_name));
+    memcpy(f_table, thread_current()->fd_table, 128);
 
     /* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -249,7 +254,8 @@ int process_exec(void *f_name)
     process_cleanup();
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
-
+    thread_current()->fd_table = f_table;
+    // thread_current()->fd_num = fd_n;
     success = load(file_name, &_if);
     /* start user program */
     // printf("loaded\n");
@@ -301,7 +307,7 @@ void process_exit(void)
     {
         process_close_file(2);
     }
-    // palloc_free_page(curr->fd_table);
+    palloc_free_page(curr->fd_table);
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).

@@ -247,10 +247,7 @@ tid_t thread_create(const char *name, int priority,
     /* fd 값 초기화(0,1은 표준 입력,출력) */
     /* File Descriptor 테이블에 메모리 할당 */
     t->fd_num = 2;
-
-    // void *fdt;
-    // fdt = palloc_get_page(PAL_ZERO | PAL_ASSERT);
-    // t->fd_table = (struct file *)fdt;
+    t->fd_table = (struct file *)palloc_get_page(PAL_ZERO | PAL_ASSERT);
 
     list_push_back(&thread_current()->children, &t->child_elem);
     /* Add to run queue. */

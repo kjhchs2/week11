@@ -120,7 +120,7 @@ struct thread
     struct intr_frame f_if;
 
     /* File */
-    struct file *fd_table[64];
+    struct file **fd_table;
     int fd_num;
 
     /* MLFQ */
