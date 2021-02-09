@@ -21,16 +21,14 @@ Executing 'exec-arg':
 (args) argv[1] = 'childarg'
 (args) argv[2] = null
 (args) end
-child-args: exit(0)
-(exec-arg) end
 exec-arg: exit(0)
 Execution of 'exec-arg' complete.
 Timer: 63 ticks
-Thread: 30 idle ticks, 29 kernel ticks, 4 user ticks
+Thread: 30 idle ticks, 30 kernel ticks, 3 user ticks
 hd0:0: 0 reads, 0 writes
 hd0:1: 154 reads, 446 writes
 hd1:0: 204 reads, 0 writes
-Console: 1061 characters output
+Console: 1026 characters output
 Keyboard: 0 keys pressed
 Exception: 0 page faults
 Powering off...

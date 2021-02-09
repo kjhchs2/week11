@@ -16,7 +16,7 @@ Executing 'multi-oom':
 child_0_O: exit(-1)
 child_0_O: exit(-1)
 Kernel PANIC at ../../filesys/inode.c:327 in inode_allow_write(): assertion `inode->deny_write_cnt > 0' failed.
-Call stack: 0x800421859a 0x8004220593 0x800421f3ea 0x800421f197 0x800421cf55 0x800421c1de 0x800420742d 0x800421d9bf 0x800421d44d 0x800420973f 0x8004209b5d 0x800421c1de 0x800420742d 0x800421d9bf 0x800421d44d 0x800420973f 0x8004209b5d 0x800421db30 0x800421d72e 0x800421d4bf 0x40011c 0x4003a7 0x40044b 0x400fb0.
+Call stack: 0x800421859a 0x80042205d3 0x800421f42a 0x800421f1d7 0x800421cf95 0x800421c21e 0x800420742d 0x800421d9ff 0x800421d48d 0x800420973f 0x8004209b5d 0x800421c21e 0x800420742d 0x800421d9ff 0x800421d48d 0x800420973f 0x8004209b5d 0x800421db70 0x800421d76e 0x800421d4ff 0x40011c 0x4003a7 0x40044b 0x400fb0.
 The `backtrace' program can make call stacks useful.
 Read "Backtraces" in the "Debugging Tools" chapter
 of the Pintos documentation for more information.

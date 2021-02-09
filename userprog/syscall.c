@@ -132,7 +132,7 @@ void syscall_handler(struct intr_frame *f UNUSED)
 tid_t exec(const char *cmd_line)
 {
     int success;
-    success = process_create_initd(cmd_line);
+    success = process_exec(cmd_line);
     return success;
 }
 

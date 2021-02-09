@@ -232,8 +232,11 @@ error:
  * Returns -1 on fail. */
 int process_exec(void *f_name)
 {
-    char *file_name = f_name;
+    char *file_name;
     bool success;
+
+    file_name = palloc_get_page(PAL_ZERO);
+    memcpy(file_name, f_name, strlen(f_name));
 
     /* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
