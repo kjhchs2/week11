@@ -175,20 +175,11 @@ __do_fork(void *aux)
     struct intr_frame *parent_if;
     /* TODO: somehow pass the parent_if. (i.e. process_fork()'s if_) */
     parent_if = &parent->f_if;
-    // parent_if->rsp = parent->tf.rsp;
-    // parent_if->rip = parent->tf.rip;
-    // parent_if->R.rbx = parent->tf.R.rbx;
-    // parent_if->R.rbp = parent->tf.R.rbp;
-    // parent_if->R.r12 = parent->tf.R.r12;
-    // parent_if->R.r13 = parent->tf.R.r13;
-    // parent_if->R.r14 = parent->tf.R.r14;
-    // parent_if->R.r15 = parent->tf.R.r15;
 
     bool succ = true;
 
     /* 1. Read the cpu context to local stack. */
     memcpy(&if_, parent_if, sizeof(struct intr_frame));
-    current->tf = if_;
 
     /* 2. Duplicate PT */
     current->pml4 = pml4_create();
@@ -209,6 +200,11 @@ __do_fork(void *aux)
         current->fd_table[i] = file_duplicate(parent->fd_table[i]);
     }
     current->fd_num = parent->fd_num;
+    // const void *buffer;
+    // printf("is_write: %d\n", file_write(parent->running_file, buffer, 100));
+    // file = filesys_open(file_name);
+    // printf("is_write: %d\n", file_write(file, buffer, 100));
+
     sema_up(&current->load);
     /* TODO: Your code goes here.
 	 * TODO: Hint) To duplicate the file object, use `file_duplicate`
@@ -234,15 +230,19 @@ error:
 int process_exec(void *f_name)
 {
     struct file **f_table;
+    struct file *r_file;
     int fd_n;
     char *file_name;
     bool success;
 
     fd_n = thread_current()->fd_num;
+    r_file = palloc_get_page(PAL_ZERO);
     f_table = palloc_get_page(PAL_ZERO);
     file_name = palloc_get_page(PAL_ZERO);
+    if (thread_current()->running_file)
+        memcpy(r_file, thread_current()->running_file, sizeof(r_file));
     memcpy(file_name, f_name, strlen(f_name));
-    memcpy(f_table, thread_current()->fd_table, 128);
+    memcpy(f_table, thread_current()->fd_table, thread_current()->fd_num);
 
     /* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -252,10 +252,12 @@ int process_exec(void *f_name)
     _if.cs = SEL_UCSEG;
     _if.eflags = FLAG_IF | FLAG_MBS;
     /* We first kill the current context */
-    // process_cleanup();
+    process_cleanup();
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
-    thread_current()->fd_table = f_table;
+    memcpy(thread_current()->fd_table, f_table, thread_current()->fd_num);
+    if (r_file)
+        memcpy(thread_current()->running_file, r_file, sizeof(r_file));
     thread_current()->fd_num = fd_n;
     success = load(file_name, &_if);
     /* start user program */
@@ -263,6 +265,9 @@ int process_exec(void *f_name)
     sema_up(&thread_current()->load);
     /* If load failed, quit. */
     palloc_free_page(file_name);
+    palloc_free_page(f_name);
+    palloc_free_page(f_table);
+    palloc_free_page(r_file);
     if (!success)
         return -1;
 
@@ -304,10 +309,11 @@ void process_exit(void)
     struct thread *curr = thread_current();
     uint32_t *pd;
 
-    for (int i = 2; i < curr->fd_num - 2; i++)
+    for (int i = 2; i < curr->fd_num; i++)
     {
         process_close_file(2);
     }
+    file_allow_write(thread_current()->running_file);
     palloc_free_page(curr->fd_table);
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -447,18 +453,16 @@ load(const char *file_name, struct intr_frame *if_)
         argc++;
     }
 
-    // argc가 인자 갯수가 되었다..
     file_name = argv[0];
-    /* 끝 */
 
     /* Open executable file. */
+    // printf("cmd: %s\n", argv[0]);
     file = filesys_open(file_name);
     if (file == NULL)
     {
         printf("load: %s: open failed\n", file_name);
         goto done;
     }
-
     /* Read and verify executable header. */
     if (file_read(file, &ehdr, sizeof ehdr) != sizeof ehdr || memcmp(ehdr.e_ident, "\177ELF\2\1\1", 7) || ehdr.e_type != 2 || ehdr.e_machine != 0x3E // amd64
         || ehdr.e_version != 1 || ehdr.e_phentsize != sizeof(struct Phdr) || ehdr.e_phnum > 1024)
@@ -466,6 +470,13 @@ load(const char *file_name, struct intr_frame *if_)
         printf("load: %s: error loading executable\n", file_name);
         goto done;
     }
+
+    /* 써지나 안써지나 테스트해봤는데 안써지는거 맞음 */
+    // const void *buffer;
+    // printf("is_write: %d\n", file_write(thread_current()->running_file, buffer, 100));
+    // file = filesys_open(file_name);
+    // printf("is_write: %d\n", file_write(file, buffer, 100));
+    /* 테스트 끝 */
 
     /* Read program headers. */
     file_ofs = ehdr.e_phoff;
@@ -539,9 +550,11 @@ load(const char *file_name, struct intr_frame *if_)
 
     success = true;
 
+    file_deny_write(file);
+    thread_current()->running_file = file;
 done:
     /* We arrive here whether the load is successful or not. */
-    file_close(file);
+    // file_close(file);
     return success;
 }
 

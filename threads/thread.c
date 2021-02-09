@@ -248,6 +248,7 @@ tid_t thread_create(const char *name, int priority,
     /* File Descriptor 테이블에 메모리 할당 */
     t->fd_num = 2;
     t->fd_table = (struct file *)palloc_get_page(PAL_ZERO | PAL_ASSERT);
+    t->running_file = palloc_get_page(PAL_ZERO | PAL_ASSERT);
 
     list_push_back(&thread_current()->children, &t->child_elem);
     /* Add to run queue. */
@@ -646,13 +647,16 @@ do_schedule(int status)
 {
     ASSERT(intr_get_level() == INTR_OFF);
     ASSERT(thread_current()->status == THREAD_RUNNING);
-    // while (!list_empty(&destruction_req))
-    // {
-    //     struct thread *victim =
-    //         list_entry(list_pop_front(&destruction_req), struct thread, elem);
-    //     // palloc_free_page(victim);
-    // }
-    thread_current()->status = status;
+#ifndef USERPROG
+    while (!list_empty(&destruction_req))
+    {
+        struct thread *victim =
+            list_entry(list_pop_front(&destruction_req), struct thread, elem);
+        // palloc_free_page(victim);
+    }
+#endif
+    thread_current()
+        ->status = status;
     schedule();
 }
 

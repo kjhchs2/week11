@@ -7,6 +7,7 @@
 #include "threads/loader.h"
 #include "userprog/gdt.h"
 #include "threads/flags.h"
+#include "threads/palloc.h"
 #include "intrinsic.h"
 #include "filesys/file.h"
 #include "filesys/filesys.h"
@@ -29,7 +30,6 @@ unsigned tell(int fd);
 void close(int fd);
 tid_t fork(struct intr_frame *f, const char *thread_name);
 tid_t exec(const char *cmd_line);
-struct lock filesys_lock;
 
 /* System call.
  *
@@ -132,7 +132,10 @@ void syscall_handler(struct intr_frame *f UNUSED)
 tid_t exec(const char *cmd_line)
 {
     int success;
-    success = process_exec(cmd_line);
+    char *cmd;
+    cmd = palloc_get_page(PAL_ZERO);
+    memcpy(cmd, cmd_line, strlen(cmd_line));
+    success = process_exec(cmd);
     return success;
 }
 
@@ -253,6 +256,8 @@ int read(int fd, void *buffer, unsigned size)
     {
         for (readn; readn < size; readn += input_getc())
             ;
+        lock_release(&filesys_lock);
+
         return readn;
     }
     lock_release(&filesys_lock);
@@ -263,15 +268,17 @@ int write(int fd, void *buffer, unsigned size)
 {
     struct file *new_file;
 
-    // lock_acquire(&filesys_lock);
+    lock_acquire(&filesys_lock);
     new_file = thread_current()->fd_table[fd];
     int writen = 0;
     if (fd == 1)
     {
         putbuf(buffer, size);
+        lock_release(&filesys_lock);
+
         return size;
     }
-    // lock_release(&filesys_lock);
+    lock_release(&filesys_lock);
     return file_write(new_file, buffer, size);
 }
 
@@ -280,7 +287,8 @@ void seek(int fd, unsigned position)
 {
     struct file *new_file;
     /* 파일 디스크립터를 이용하여 파일 객체 검색 */
-    new_file = process_get_file(fd);
+    new_file = thread_current()->fd_table[fd];
+
     /* 해당 열린 파일의 위치(offset)를 position만큼 이동 */
     file_seek(new_file, position);
 }

@@ -66,6 +66,7 @@ int main(void) NO_RETURN;
 /* Pintos main program. */
 int main(void)
 {
+    lock_init(&filesys_lock);
     uint64_t mem_end;
     char **argv;
 

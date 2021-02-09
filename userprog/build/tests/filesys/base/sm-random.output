@@ -16,14 +16,17 @@ Executing 'sm-random':
 (sm-random) create "bazzle"
 (sm-random) open "bazzle"
 (sm-random) write "bazzle" in random order
-sm-random: exit(-1)
+(sm-random) read "bazzle" in random order
+(sm-random) close "bazzle"
+(sm-random) end
+sm-random: exit(0)
 Execution of 'sm-random' complete.
-Timer: 61 ticks
-Thread: 30 idle ticks, 27 kernel ticks, 4 user ticks
+Timer: 69 ticks
+Thread: 30 idle ticks, 26 kernel ticks, 13 user ticks
 hd0:0: 0 reads, 0 writes
-hd0:1: 124 reads, 264 writes
+hd0:1: 376 reads, 390 writes
 hd1:0: 110 reads, 0 writes
-Console: 923 characters output
+Console: 1008 characters output
 Keyboard: 0 keys pressed
-Exception: 1 page faults
+Exception: 0 page faults
 Powering off...

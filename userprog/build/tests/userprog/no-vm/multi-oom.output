@@ -13,3 +13,5 @@ Boot complete.
 Putting 'multi-oom' into the file system...
 Executing 'multi-oom':
 (multi-oom) begin
+child_6_X: exit(-1)
+child_7_X: exit(-1)

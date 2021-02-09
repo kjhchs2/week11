@@ -106,6 +106,8 @@ struct thread
     /* load 세마포어 */
     /* exit 호출 시 종료 status */
 
+    struct file *running_file;
+
     /* Process */
     struct thread *parent;
     struct list children;
