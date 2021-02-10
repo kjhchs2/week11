@@ -200,6 +200,7 @@ __do_fork(void *aux)
         current->fd_table[i] = file_duplicate(parent->fd_table[i]);
     }
     current->fd_num = parent->fd_num;
+    // current->running_file = file_duplicate(parent->running_file);
     // const void *buffer;
     // printf("is_write: %d\n", file_write(parent->running_file, buffer, 100));
     // file = filesys_open(file_name);
@@ -298,7 +299,8 @@ void process_exit(void)
     {
         process_close_file(2);
     }
-    file_allow_write(thread_current()->running_file);
+    if (thread_current()->running_file)
+        file_close(thread_current()->running_file);
     palloc_free_page(curr->fd_table);
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
@@ -850,6 +852,6 @@ void process_close_file(int fd)
     file_close(cur_t->fd_table[fd]);
     /* 파일 디스크립터 테이블 해당 엔트리 초기화 */
     cur_t->fd_table[fd] = cur_t->fd_table[cur_t->fd_num - 1];
-    cur_t->fd_table[cur_t->fd_num - 1] = 0;
+    cur_t->fd_table[cur_t->fd_num - 1] = NULL;
     cur_t->fd_num--;
 }

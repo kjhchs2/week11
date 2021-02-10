@@ -222,20 +222,27 @@ int open(const char *file)
         return -1;
     }
 
-    new_file = filesys_open(file);
-    for (int i = 2; i < cur_t->fd_num; i++)
+    if (cur_t->fd_num < 500)
     {
-        if (file_get_inode(cur_t->fd_table[i]) == new_file)
+        new_file = filesys_open(file);
+        for (int i = 2; i < cur_t->fd_num; i++)
         {
-            new_file = file_reopen(new_file);
-            return process_add_file(new_file);
+            if (file_get_inode(cur_t->fd_table[i]) == new_file)
+            {
+                new_file = file_reopen(new_file);
+                return process_add_file(new_file);
+            }
         }
-    }
 
-    if (new_file != NULL)
-        return process_add_file(new_file);
+        if (new_file != NULL)
+            return process_add_file(new_file);
+        else
+            return -1;
+    }
     else
+    {
         return -1;
+    }
 }
 
 int filesize(int fd)
