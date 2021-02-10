@@ -229,20 +229,12 @@ error:
  * Returns -1 on fail. */
 int process_exec(void *f_name)
 {
-    struct file **f_table;
-    struct file *r_file;
-    int fd_n;
-    char *file_name;
+    char file_name[128] = {
+        0,
+    };
     bool success;
 
-    fd_n = thread_current()->fd_num;
-    r_file = palloc_get_page(PAL_ZERO);
-    f_table = palloc_get_page(PAL_ZERO);
-    file_name = palloc_get_page(PAL_ZERO);
-    if (thread_current()->running_file)
-        memcpy(r_file, thread_current()->running_file, sizeof(r_file));
     memcpy(file_name, f_name, strlen(f_name));
-    memcpy(f_table, thread_current()->fd_table, thread_current()->fd_num);
 
     /* We cannot use the intr_frame in the thread structure.
 	 * This is because when current thread rescheduled,
@@ -255,19 +247,12 @@ int process_exec(void *f_name)
     process_cleanup();
     /* And then load the binary */
     /* if_.esp는 스택 포인터 */
-    memcpy(thread_current()->fd_table, f_table, thread_current()->fd_num);
-    if (r_file)
-        memcpy(thread_current()->running_file, r_file, sizeof(r_file));
-    thread_current()->fd_num = fd_n;
     success = load(file_name, &_if);
     /* start user program */
     // printf("loaded\n");
     sema_up(&thread_current()->load);
     /* If load failed, quit. */
-    palloc_free_page(file_name);
     palloc_free_page(f_name);
-    palloc_free_page(f_table);
-    palloc_free_page(r_file);
     if (!success)
         return -1;
 
