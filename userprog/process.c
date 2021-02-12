@@ -824,7 +824,7 @@ struct thread *get_child_process(int pid)
 void remove_child_process(struct thread *cp)
 {
     list_remove(&cp->child_elem);
-
+    list_remove(&cp->elem);
     palloc_free_page(cp);
 }
 
