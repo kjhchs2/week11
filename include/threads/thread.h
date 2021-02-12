@@ -114,6 +114,7 @@ struct thread
     struct list_elem child_elem;
     int is_loaded;
     int is_finished;
+
     struct semaphore exit;
     struct semaphore load;
     int exit_status;

@@ -115,8 +115,12 @@ tid_t process_fork(const char *name, struct intr_frame *if_ UNUSED)
         struct thread *cp;
         cp = get_child_process(tid);
         sema_down(&cp->load);
+        if (cp->is_loaded)
+            return tid;
+        else
+            return -1;
     }
-    return tid;
+    return -1;
 }
 
 #ifndef VM
@@ -193,7 +197,9 @@ __do_fork(void *aux)
         goto error;
 #else
     if (!pml4_for_each(parent->pml4, duplicate_pte, parent))
+    {
         goto error;
+    }
 #endif
     for (int i = 2; i < parent->fd_num; i++)
     {
@@ -205,7 +211,7 @@ __do_fork(void *aux)
     // printf("is_write: %d\n", file_write(parent->running_file, buffer, 100));
     // file = filesys_open(file_name);
     // printf("is_write: %d\n", file_write(file, buffer, 100));
-
+    current->is_loaded = 1;
     sema_up(&current->load);
     /* TODO: Your code goes here.
 	 * TODO: Hint) To duplicate the file object, use `file_duplicate`
@@ -294,8 +300,8 @@ void process_exit(void)
 {
     struct thread *curr = thread_current();
     uint32_t *pd;
-
-    for (int i = 2; i < curr->fd_num; i++)
+    int target = curr->fd_num;
+    for (int i = 2; i < target; i++)
     {
         process_close_file(2);
     }
@@ -818,6 +824,7 @@ struct thread *get_child_process(int pid)
 void remove_child_process(struct thread *cp)
 {
     list_remove(&cp->child_elem);
+
     palloc_free_page(cp);
 }
 

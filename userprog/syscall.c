@@ -216,7 +216,7 @@ int open(const char *file)
 {
     struct file *new_file;
     struct thread *cur_t = thread_current();
-
+    check_address(file);
     if (file == NULL)
     {
         return -1;
