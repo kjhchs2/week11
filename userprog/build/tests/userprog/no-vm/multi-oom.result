@@ -1,15 +1,15 @@
 FAIL
-Kernel panic in run: PANIC at ../../userprog/exception.c:99 in kill(): Kernel bug - unexpected interrupt in kernel
-Call stack: 0x80042185db 0x800421d4b3 0x8004209780 0x8004209b9e 0x8004219361 0x80042196fc 0x800420a942 0x80042074b1 0x800421db6a 0x800421d7a3 0x800421d625c
+Kernel panic in run: PANIC at ../../threads/palloc.c:281 in palloc_get_multiple(): palloc_get: out of pages
+Call stack: 0x80042185b5 0x800420bec6 0x800420beed 0x800420709c 0x800421bd23 0x800421da2f 0x800421d7ca 0x800421d62f 0x40037b 0x4004b1 0x400fb0
 Translation of call stack:
-0x00000080042185db: debug_panic (lib/kernel/debug.c:32)
-0x000000800421d4b3: kill (userprog/exception.c:105)
-0x0000008004209780: intr_handler (threads/interrupt.c:352)
-0x0000008004209b9e: intr_entry (threads/intr-stubs.o:?)
-0x0000008004219361: find_end_of_run (lib/kernel/list.c:348 (discriminator 1))
-0x00000080042196fc: list_sort (lib/kernel/list.c:401)
-0x000000800420a942: sema_up (threads/synch.c:120)
-0x00000080042074b1: thread_exit (threads/thread.c:355)
-0x000000800421db6a: halt (userprog/syscall.c:186)
-0x000000800421d7a3: syscall_handler (userprog/syscall.c:82)
-0x00000800421d625c: (unknown)
+0x00000080042185b5: debug_panic (lib/kernel/debug.c:32)
+0x000000800420bec6: palloc_get_multiple (threads/palloc.c:284)
+0x000000800420beed: palloc_get_page (threads/palloc.c:297)
+0x000000800420709c: thread_create (threads/thread.c:250)
+0x000000800421bd23: process_fork (userprog/process.c:111)
+0x000000800421da2f: fork (userprog/syscall.c:145)
+0x000000800421d7ca: syscall_handler (userprog/syscall.c:82)
+0x000000800421d62f: no_sti (userprog/syscall-entry.o:?)
+0x000000000040037b: (unknown)
+0x00000000004004b1: (unknown)
+0x0000000000400fb0: (unknown)
