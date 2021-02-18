@@ -43,12 +43,22 @@ struct hash_elem {
  * auxiliary data AUX. */
 typedef uint64_t hash_hash_func (const struct hash_elem *e, void *aux);
 
+/* hash_hash_func sample*/
+/* Returns a hash value for page p. */
+unsigned
+page_hash (const struct hash_elem *p_, void *aux UNUSED);
+
 /* Compares the value of two hash elements A and B, given
  * auxiliary data AUX.  Returns true if A is less than B, or
  * false if A is greater than or equal to B. */
 typedef bool hash_less_func (const struct hash_elem *a,
 		const struct hash_elem *b,
 		void *aux);
+
+/* Page less Sample*/
+bool
+page_less (const struct hash_elem *a_,
+           const struct hash_elem *b_, void *aux UNUSED);
 
 /* Performs some operation on hash element E, given auxiliary
  * data AUX. */

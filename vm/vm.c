@@ -48,25 +48,68 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
 
 	struct supplemental_page_table *spt = &thread_current ()->spt;
 
+    uintptr_t pg_ptr = (uintptr_t)aux;
+
 	/* Check wheter the upage is already occupied or not. */
 	if (spt_find_page (spt, upage) == NULL) {
-		/* TODO: Create the page, fetch the initialier according to the VM type,
-		 * TODO: and then create "uninit" page struct by calling uninit_new. You
-		 * TODO: should modify the field after calling the uninit_new. */
+        bool (*initializer)(struct page *, enum vm_type, void *kva);
 
+        struct page *page = palloc_get_page(PAL_USER | PAL_ZERO);
+        
+        if (VM_TYPE(type) == VM_ANON)
+            initializer = anon_initializer;
+        else if (VM_TYPE(type) == VM_FILE) 
+            initializer = file_backed_initializer;
+        else
+            goto err;
+        uninit_new(page, upage, lazy_load_segment, type, pg_ptr, initializer);
+       
+		/* TODO: Create the page, fetch the initializer according to the VM type,
+		 * TODO: and then create "uninit" page struct by calling uninit_new. You
+		
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        이거 아직 안함
+         * TODO: should modify the field after calling the uninit_new. */
+        
 		/* TODO: Insert the page into the spt. */
+        spt_insert_page(spt, page);
 	}
 err:
 	return false;
 }
 
+// //후보 1번 : PPT 방식
+// /* Find VA from spt and return page. On error, return NULL. */
+// struct page *
+// spt_find_page (struct supplemental_page_table *spt UNUSED, void *va UNUSED) {
+// 	struct page *page = NULL;
+// 	/* TODO: Fill this function. */
+//     struct hash_iterator i;
+
+//     struct page* page_find = pg_round_down((uintptr_t*)va) // 이게 페이지가 맞는지 모르겠다. 주소값인거같다.
+//     struct hash_elem* return_value = hash_find(&spt->pages, &page_find->hash_elem);
+//     if (return_value == NULL)
+//         return NULL
+// 	else
+//         return hash_entry(return_value, struct page, hash_elem);
+// }
+
+// 후보 2번 : 민규머리
 /* Find VA from spt and return page. On error, return NULL. */
 struct page *
 spt_find_page (struct supplemental_page_table *spt UNUSED, void *va UNUSED) {
 	struct page *page = NULL;
 	/* TODO: Fill this function. */
+    struct hash_iterator i;
 
-	return page;
+    hash_first(&i, &spt->pages);
+    while (hash_next(&i))
+    {
+        page = hash_entry(hash_cur(&i), struct page, hash_elem);
+        if (page->va == va)
+            return page;
+    }
+	return NULL;
 }
 
 /* Insert PAGE into spt with validation. */
@@ -75,10 +118,14 @@ spt_insert_page (struct supplemental_page_table *spt UNUSED,
 		struct page *page UNUSED) {
 	int succ = false;
 	/* TODO: Fill this function. */
-
+    struct hash_elem *he = hash_insert(&spt->pages, &page->hash_elem);
+    if (he == NULL){
+        succ = true;
+    }
 	return succ;
 }
 
+/* 무언가 하라는 말이 없는데 수정할 필요 없나?*/
 void
 spt_remove_page (struct supplemental_page_table *spt, struct page *page) {
 	vm_dealloc_page (page);
@@ -112,6 +159,8 @@ static struct frame *
 vm_get_frame (void) {
 	struct frame *frame = NULL;
 	/* TODO: Fill this function. */
+    frame->page = palloc_get_page(PAL_ZERO | PAL_USER);
+
 
 	ASSERT (frame != NULL);
 	ASSERT (frame->page == NULL);
@@ -174,6 +223,7 @@ vm_do_claim_page (struct page *page) {
 /* Initialize new supplemental page table */
 void
 supplemental_page_table_init (struct supplemental_page_table *spt UNUSED) {
+    hash_init(&spt->pages, page_hash, page_less, NULL);
 }
 
 /* Copy supplemental page table from src to dst */
@@ -186,5 +236,25 @@ supplemental_page_table_copy (struct supplemental_page_table *dst UNUSED,
 void
 supplemental_page_table_kill (struct supplemental_page_table *spt UNUSED) {
 	/* TODO: Destroy all the supplemental_page_table hold by thread and
-	 * TODO: writeback all the modified contents to the storage. */
+	이거 업데이트 필요
+    * TODO: writeback all the modified contents to the storage. */
+    
+    // struct hash_iterator i;
+    // hash_first(&i, &spt->pages);
+    // while (hash_next(&i))
+    // {
+    //     destroy(hash_entry(hash_cur(&i), struct page, hash_elem));
+    // }
+    hash_destroy(&spt->pages, get_page_and_free);
+}
+
+void
+get_page_and_free(struct hash_elem * he, void* aux){
+    struct page *page = hash_entry(he, struct page, hash_elem);
+    /*Clean up the associated Frame*/
+
+
+
+    /*Clean up the associated Frame*/
+    palloc_free_page(page);
 }

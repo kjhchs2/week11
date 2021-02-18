@@ -308,10 +308,13 @@ void process_exit(void)
     if (thread_current()->running_file)
         file_close(thread_current()->running_file);
     palloc_free_page(curr->fd_table);
+
     /* TODO: Your code goes here.
 	 * TODO: Implement process termination message (see
 	 * TODO: project2/process_termination.html).
 	 * TODO: We recommend you to implement process resource cleanup here. */
+
+    supplemental_page_table_kill (&curr->spt);
 
     process_cleanup();
 }
@@ -702,7 +705,7 @@ install_page(void *upage, void *kpage, bool writable)
 	 * address, then map our page there. */
     return (pml4_get_page(t->pml4, upage) == NULL && pml4_set_page(t->pml4, upage, kpage, writable));
 }
-#else
+//#else
 /* From here, codes will be used after project 3.
  * If you want to implement the function for only project 2, implement it on the
  * upper block. */
@@ -710,9 +713,30 @@ install_page(void *upage, void *kpage, bool writable)
 static bool
 lazy_load_segment(struct page *page, void *aux)
 {
+    struct frame *frame = palloc_get_page(PAL_USER | PAL_ZERO);
     /* TODO: Load the segment from the file */
     /* TODO: This called when the first page fault occurs on address VA. */
     /* TODO: VA is available when calling this function. */
+    struct file *file = (struct file *)((uintptr_t*)aux)[0];
+    size_t page_read_bytes = (size_t)((uintptr_t*)aux)[1];
+    size_t page_zero_bytes = PGSIZE - page_read_bytes;
+    bool writable = (bool)((uintptr_t*)aux)[2];
+
+    if (file_read(file, frame, page_read_bytes) != (int)page_read_bytes)
+    {
+        palloc_free_page(frame);
+        return false;
+    }
+    memset(frame + page_read_bytes, 0, page_zero_bytes);
+
+    if (!install_page(page->va, frame, writable))
+    {
+        printf("fail\n");
+        palloc_free_page(frame);
+        return false;
+    }
+
+    return true;
 }
 
 /* Loads a segment starting at offset OFS in FILE at address
@@ -737,6 +761,8 @@ load_segment(struct file *file, off_t ofs, uint8_t *upage,
     ASSERT(pg_ofs(upage) == 0);
     ASSERT(ofs % PGSIZE == 0);
 
+    uintptr_t pg_ptr = file_seek(file, ofs);
+
     while (read_bytes > 0 || zero_bytes > 0)
     {
         /* Do calculate how to fill this page.
@@ -746,7 +772,11 @@ load_segment(struct file *file, off_t ofs, uint8_t *upage,
         size_t page_zero_bytes = PGSIZE - page_read_bytes;
 
         /* TODO: Set up aux to pass information to the lazy_load_segment. */
-        void *aux = NULL;
+        void *aux[3];
+        ((uintptr_t*)aux)[0] = file;
+        ((uintptr_t*)aux)[1] = page_read_bytes;
+        ((uintptr_t*)aux)[2] = writable;
+
         if (!vm_alloc_page_with_initializer(VM_ANON, upage,
                                             writable, lazy_load_segment, aux))
             return false;
@@ -754,6 +784,7 @@ load_segment(struct file *file, off_t ofs, uint8_t *upage,
         /* Advance. */
         read_bytes -= page_read_bytes;
         zero_bytes -= page_zero_bytes;
+        pg_ptr += PGSIZE
         upage += PGSIZE;
     }
     return true;
@@ -770,6 +801,24 @@ setup_stack(struct intr_frame *if_)
 	 * TODO: If success, set the rsp accordingly.
 	 * TODO: You should mark the page is stack. */
     /* TODO: Your code goes here */
+
+    uint8_t *kpage;
+    bool success = false;
+    struct supplemental_page_table *spt = &thread_current ()->spt;
+    struct page * page = palloc_get_page(PAL_USER | PAL_ZERO);
+
+    kpage = palloc_get_page(PAL_USER | PAL_ZERO);
+    if (kpage != NULL)
+    {
+        success = install_page(((uint8_t *)USER_STACK) - PGSIZE, kpage, true);
+        if (success)
+            if_->rsp = USER_STACK;
+        else
+            palloc_free_page(kpage);
+    }
+
+    
+    spt_insert_page (spt, !!!!!!!!!!!!!!);
 
     return success;
 }
