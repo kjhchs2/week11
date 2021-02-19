@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "memory": "cpp",
+        "string": "cpp",
+        "utility": "cpp"
     }
 }

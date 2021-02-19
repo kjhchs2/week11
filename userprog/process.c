@@ -805,7 +805,6 @@ setup_stack(struct intr_frame *if_)
     uint8_t *kpage;
     bool success = false;
     struct supplemental_page_table *spt = &thread_current ()->spt;
-    struct page * page = palloc_get_page(PAL_USER | PAL_ZERO);
 
     kpage = palloc_get_page(PAL_USER | PAL_ZERO);
     if (kpage != NULL)
@@ -817,8 +816,10 @@ setup_stack(struct intr_frame *if_)
             palloc_free_page(kpage);
     }
 
-    
-    spt_insert_page (spt, !!!!!!!!!!!!!!);
+    //1. page 생성?
+    //2. page 멤버들 설정
+    //3. insert 함수로 해시테이블(spt)에 추가
+    vm_alloc_page_with_initializer(VM_ANON | VM_MARKER_0, stack_bottom, true, NULL, NULL);
 
     return success;
 }

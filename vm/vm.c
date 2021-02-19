@@ -71,6 +71,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
         이거 아직 안함
          * TODO: should modify the field after calling the uninit_new. */
         
+        // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 		/* TODO: Insert the page into the spt. */
         spt_insert_page(spt, page);
 	}
