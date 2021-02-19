@@ -62,7 +62,7 @@ vm_alloc_page_with_initializer (enum vm_type type, void *upage, bool writable,
             initializer = file_backed_initializer;
         else
             goto err;
-        uninit_new(page, upage, lazy_load_segment, type, pg_ptr, initializer);
+        uninit_new(page, upage, init, type, pg_ptr, initializer);
        
 		/* TODO: Create the page, fetch the initializer according to the VM type,
 		 * TODO: and then create "uninit" page struct by calling uninit_new. You

@@ -1,7 +1,6 @@
 {
     "files.associations": {
-        "memory": "cpp",
-        "string": "cpp",
-        "utility": "cpp"
+        "vm.h": "c",
+        "hash.h": "c"
     }
 }

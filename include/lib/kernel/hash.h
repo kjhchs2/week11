@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include "list.h"
 #include "lib/debug.h"
-#include "vm/vm.h"
+// #include "vm/vm.h"
 
 /* Hash element. */
 struct hash_elem {

@@ -705,10 +705,22 @@ install_page(void *upage, void *kpage, bool writable)
 	 * address, then map our page there. */
     return (pml4_get_page(t->pml4, upage) == NULL && pml4_set_page(t->pml4, upage, kpage, writable));
 }
-//#else
+#else
 /* From here, codes will be used after project 3.
  * If you want to implement the function for only project 2, implement it on the
  * upper block. */
+
+
+static bool     //else안에서도 선언 필요??
+install_page(void *upage, void *kpage, bool writable)
+{
+    struct thread *t = thread_current();
+
+    /* Verify that there's not already a page at that virtual
+	 * address, then map our page there. */
+    return (pml4_get_page(t->pml4, upage) == NULL && pml4_set_page(t->pml4, upage, kpage, writable));
+}
+
 
 static bool
 lazy_load_segment(struct page *page, void *aux)
@@ -761,7 +773,7 @@ load_segment(struct file *file, off_t ofs, uint8_t *upage,
     ASSERT(pg_ofs(upage) == 0);
     ASSERT(ofs % PGSIZE == 0);
 
-    uintptr_t pg_ptr = file_seek(file, ofs);
+    // uintptr_t pg_ptr = file_seek(file, ofs);
 
     while (read_bytes > 0 || zero_bytes > 0)
     {
@@ -784,7 +796,7 @@ load_segment(struct file *file, off_t ofs, uint8_t *upage,
         /* Advance. */
         read_bytes -= page_read_bytes;
         zero_bytes -= page_zero_bytes;
-        pg_ptr += PGSIZE
+        // pg_ptr += PGSIZE
         upage += PGSIZE;
     }
     return true;
@@ -803,7 +815,6 @@ setup_stack(struct intr_frame *if_)
     /* TODO: Your code goes here */
 
     uint8_t *kpage;
-    bool success = false;
     struct supplemental_page_table *spt = &thread_current ()->spt;
 
     kpage = palloc_get_page(PAL_USER | PAL_ZERO);
